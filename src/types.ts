@@ -11,6 +11,11 @@ export interface MenuCategory {
   items: MenuItem[];
 }
 
+export interface MenuAnalysisResult {
+  categories: MenuCategory[];
+  orderingPhrase: string; // The phrase in the local language of the menu (e.g., Japanese)
+}
+
 export interface CartItem extends MenuItem {
   quantity: number;
 }

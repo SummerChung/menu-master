@@ -8,9 +8,10 @@ interface Props {
   onBack: () => void;
   onReset: () => void;
   langCode: string;
+  localOrderingPhrase: string;
 }
 
-const OrderSummary: React.FC<Props> = ({ cart, onBack, onReset, langCode }) => {
+const OrderSummary: React.FC<Props> = ({ cart, onBack, onReset, langCode, localOrderingPhrase }) => {
   const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const t = (key: string) => getTranslation(langCode, key);
 
@@ -32,9 +33,11 @@ const OrderSummary: React.FC<Props> = ({ cart, onBack, onReset, langCode }) => {
         {/* Speech Bubble */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-stone-200 mb-6 relative">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-white border-t border-l border-stone-200 transform rotate-45"></div>
+            {/* Primary Text: The Local Language Phrase (or fallback to translated UI text if missing) */}
             <p className="text-xl font-bold text-stone-800 text-center mb-2">
-                「{t('summary.speechBubble')}」
+                「{localOrderingPhrase || t('summary.speechBubble')}」
             </p>
+            {/* Secondary Text: Helper text in user's language */}
             <p className="text-center text-stone-400 text-xs">
                 {t('summary.speechSub')}
             </p>

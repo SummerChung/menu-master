@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { MenuCategory } from '../types';
+import { MenuAnalysisResult, MenuCategory } from '../types';
 
 export interface GenerativePart {
   inlineData: {
@@ -35,7 +35,7 @@ export const fileToGenerativePart = async (file: File): Promise<GenerativePart> 
 };
 
 // Analyze menu images using Gemini
-export const analyzeMenu = async (imageParts: GenerativePart[], targetLanguage: string): Promise<MenuCategory[]> => {
+export const analyzeMenu = async (imageParts: GenerativePart[], targetLanguage: string): Promise<MenuAnalysisResult> => {
   // Retrieve API Key from standard Vite env injection
   // @ts-ignore
   let rawApiKey = import.meta.env.VITE_API_KEY || process.env.API_KEY;
@@ -61,40 +61,45 @@ export const analyzeMenu = async (imageParts: GenerativePart[], targetLanguage: 
         parts: [
           ...imageParts,
           {
-            text: `Analyze these menu images (there may be multiple pages). Extract all food and drink items from ALL pages.
-            Group them into logical categories (e.g., Appetizers, Yakitori, Main, Drinks) based on the visual layout.
-            If the same category appears on multiple pages, merge them.
+            text: `Analyze these menu images. 
+            1. Identify the language of the menu (e.g., Japanese, Italian).
+            2. Create a polite "ordering phrase" in THAT identified language meaning "Excuse me, I would like to order this" (e.g., if Japanese, return "すみません、これを注文したいです").
+            3. Extract all food/drink items. Group them into logical categories.
+            4. Translate item names and descriptions into ${targetLanguage}.
             
-            For each item, provide:
-            1. originalName: The exact name on the menu (usually in the local language like Japanese).
-            2. translatedName: Translate the name into ${targetLanguage}.
-            3. description: A short, appetizing description (max 10 words) in ${targetLanguage}.
-            4. price: The numeric price (numbers only, ignore symbols).
-
-            Return a structured JSON.`
+            Return a JSON object.`
           }
         ]
       },
       config: {
         responseMimeType: "application/json",
         responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              name: { type: Type.STRING, description: "Category name in target language" },
-              items: {
+          type: Type.OBJECT,
+          properties: {
+            orderingPhrase: {
+                type: Type.STRING,
+                description: "The phrase 'Excuse me, I would like to order this' in the MENU'S original language."
+            },
+            categories: {
                 type: Type.ARRAY,
                 items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    originalName: { type: Type.STRING },
-                    translatedName: { type: Type.STRING },
-                    description: { type: Type.STRING },
-                    price: { type: Type.NUMBER },
-                  }
+                    type: Type.OBJECT,
+                    properties: {
+                    name: { type: Type.STRING, description: "Category name in target language" },
+                    items: {
+                        type: Type.ARRAY,
+                        items: {
+                        type: Type.OBJECT,
+                        properties: {
+                            originalName: { type: Type.STRING },
+                            translatedName: { type: Type.STRING },
+                            description: { type: Type.STRING },
+                            price: { type: Type.NUMBER },
+                        }
+                        }
+                    }
+                    }
                 }
-              }
             }
           }
         }
@@ -114,7 +119,7 @@ export const analyzeMenu = async (imageParts: GenerativePart[], targetLanguage: 
     const rawData = JSON.parse(text);
 
     // Post-process to ensure IDs exist
-    const categories: MenuCategory[] = rawData.map((cat: any, catIndex: number) => ({
+    const categories: MenuCategory[] = (rawData.categories || []).map((cat: any, catIndex: number) => ({
       name: cat.name || "General",
       items: (cat.items || []).map((item: any, itemIndex: number) => ({
         id: `item-${catIndex}-${itemIndex}-${Date.now()}`,
@@ -125,7 +130,10 @@ export const analyzeMenu = async (imageParts: GenerativePart[], targetLanguage: 
       }))
     }));
 
-    return categories;
+    return {
+        categories,
+        orderingPhrase: rawData.orderingPhrase || ""
+    };
 
   } catch (error: any) {
     console.error("Gemini Analysis Error:", error);

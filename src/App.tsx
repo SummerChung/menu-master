@@ -11,6 +11,7 @@ const App: React.FC = () => {
   const [screen, setScreen] = useState<AppScreen>('LANGUAGE');
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageOption | null>(null);
   const [menuData, setMenuData] = useState<MenuCategory[]>([]);
+  const [localOrderingPhrase, setLocalOrderingPhrase] = useState<string>("");
   const [cart, setCart] = useState<CartItem[]>([]);
 
   const langCode = selectedLanguage?.code || 'en-US';
@@ -29,10 +30,11 @@ const App: React.FC = () => {
       const partPromises = files.map(file => fileToGenerativePart(file));
       const imageParts = await Promise.all(partPromises);
       
-      const data = await analyzeMenu(imageParts, selectedLanguage.label);
+      const result = await analyzeMenu(imageParts, selectedLanguage.label);
       
-      if (data && data.length > 0) {
-        setMenuData(data);
+      if (result && result.categories.length > 0) {
+        setMenuData(result.categories);
+        setLocalOrderingPhrase(result.orderingPhrase);
         setScreen('ORDERING');
       } else {
         alert("Could not identify menu items. Please try again with a clearer photo.");
@@ -54,6 +56,7 @@ const App: React.FC = () => {
   const handleReset = () => {
     setCart([]);
     setMenuData([]);
+    setLocalOrderingPhrase("");
     setSelectedLanguage(null);
     setScreen('LANGUAGE');
   };
@@ -91,6 +94,7 @@ const App: React.FC = () => {
           onBack={() => setScreen('ORDERING')}
           onReset={handleReset}
           langCode={langCode}
+          localOrderingPhrase={localOrderingPhrase}
         />
       )}
     </div>
