@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
-import { MOCK_LOADING_STEPS } from '../constants';
+import { getTranslation, LOADING_STEPS } from '../translations';
 
-const ProcessingScreen: React.FC = () => {
+interface Props {
+  langCode: string;
+}
+
+const ProcessingScreen: React.FC<Props> = ({ langCode }) => {
   const [stepIndex, setStepIndex] = useState(0);
+  
+  const steps = LOADING_STEPS[langCode] || LOADING_STEPS['en-US'];
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setStepIndex((prev) => (prev + 1) % MOCK_LOADING_STEPS.length);
+      setStepIndex((prev) => (prev + 1) % steps.length);
     }, 1200);
     return () => clearInterval(interval);
-  }, []);
+  }, [steps.length]);
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-[#fafaf9] p-8">
@@ -22,10 +28,10 @@ const ProcessingScreen: React.FC = () => {
       </div>
 
       <h2 className="text-2xl font-bold text-stone-800 mb-2 text-center">
-        Analyzing Menu...
+        {getTranslation(langCode, 'processing.title')}
       </h2>
       <p className="text-stone-500 text-center text-sm h-6 transition-all duration-300">
-        {MOCK_LOADING_STEPS[stepIndex]}
+        {steps[stepIndex]}
       </p>
 
       <div className="mt-8 w-48 h-1 bg-stone-200 rounded-full overflow-hidden">

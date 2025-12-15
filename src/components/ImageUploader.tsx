@@ -1,12 +1,14 @@
 import React, { useRef, useState } from 'react';
 import { Camera, Image as ImageIcon, ArrowLeft, X, Check, Plus } from 'lucide-react';
+import { getTranslation } from '../translations';
 
 interface Props {
   onBack: () => void;
   onImagesConfirmed: (files: File[]) => void;
+  langCode: string;
 }
 
-const ImageUploader: React.FC<Props> = ({ onBack, onImagesConfirmed }) => {
+const ImageUploader: React.FC<Props> = ({ onBack, onImagesConfirmed, langCode }) => {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -45,6 +47,8 @@ const ImageUploader: React.FC<Props> = ({ onBack, onImagesConfirmed }) => {
     }
   };
 
+  const t = (key: string) => getTranslation(langCode, key);
+
   return (
     <div className="flex flex-col h-full bg-[#fafaf9] min-h-screen relative">
       <header className="absolute top-0 left-0 w-full p-4 z-10 flex items-center">
@@ -58,9 +62,9 @@ const ImageUploader: React.FC<Props> = ({ onBack, onImagesConfirmed }) => {
 
       <div className="flex-1 flex flex-col p-6 pt-20">
         <div className="text-center space-y-2 mb-8">
-            <h2 className="text-2xl font-bold text-stone-800">Scan Menu</h2>
+            <h2 className="text-2xl font-bold text-stone-800">{t('upload.title')}</h2>
             <p className="text-stone-500 text-sm max-w-xs mx-auto leading-relaxed">
-                Take photos of all menu pages. We'll combine them into one order list.
+                {t('upload.subtitle')}
             </p>
         </div>
 
@@ -69,7 +73,7 @@ const ImageUploader: React.FC<Props> = ({ onBack, onImagesConfirmed }) => {
             {selectedFiles.length === 0 ? (
                 <div className="h-64 border-2 border-dashed border-stone-300 rounded-2xl flex flex-col items-center justify-center text-stone-400 bg-stone-100/50">
                     <ImageIcon className="w-12 h-12 mb-2 opacity-50" />
-                    <span className="text-sm">No images selected</span>
+                    <span className="text-sm">{t('upload.noImages')}</span>
                 </div>
             ) : (
                 <div className="grid grid-cols-2 gap-4">
@@ -83,14 +87,14 @@ const ImageUploader: React.FC<Props> = ({ onBack, onImagesConfirmed }) => {
                                 <X className="w-4 h-4" />
                             </button>
                             <div className="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-full backdrop-blur-sm">
-                                Page {index + 1}
+                                {index + 1}
                             </div>
                         </div>
                     ))}
                     {/* Placeholder to suggest adding more */}
                     <button onClick={triggerCamera} className="aspect-[3/4] rounded-xl border-2 border-dashed border-stone-300 flex flex-col items-center justify-center text-stone-400 hover:bg-stone-100 transition-colors">
                         <Plus className="w-8 h-8 mb-1" />
-                        <span className="text-xs">Add Page</span>
+                        <span className="text-xs">{t('upload.addPage')}</span>
                     </button>
                 </div>
             )}
@@ -123,7 +127,7 @@ const ImageUploader: React.FC<Props> = ({ onBack, onImagesConfirmed }) => {
                 className="w-full bg-amber-700 hover:bg-amber-800 text-white text-lg font-bold py-4 rounded-2xl shadow-lg shadow-amber-200/50 flex items-center justify-center gap-2 transition-transform active:scale-95"
             >
                 <Check className="w-6 h-6" />
-                <span>Analyze Menu ({selectedFiles.length})</span>
+                <span>{t('upload.analyze')} ({selectedFiles.length})</span>
             </button>
         ) : (
             <div className="grid grid-cols-2 gap-4">
@@ -132,7 +136,7 @@ const ImageUploader: React.FC<Props> = ({ onBack, onImagesConfirmed }) => {
                 className="bg-stone-800 hover:bg-stone-900 text-white py-4 rounded-2xl shadow-lg flex flex-col items-center justify-center gap-2 transition-transform active:scale-95"
                 >
                 <Camera className="w-6 h-6" />
-                <span className="font-semibold">Camera</span>
+                <span className="font-semibold">{t('upload.camera')}</span>
                 </button>
                 
                 <button
@@ -140,7 +144,7 @@ const ImageUploader: React.FC<Props> = ({ onBack, onImagesConfirmed }) => {
                 className="bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-200 py-4 rounded-2xl shadow-sm flex flex-col items-center justify-center gap-2 transition-transform active:scale-95"
                 >
                 <ImageIcon className="w-6 h-6" />
-                <span className="font-semibold">Gallery</span>
+                <span className="font-semibold">{t('upload.gallery')}</span>
                 </button>
             </div>
         )}

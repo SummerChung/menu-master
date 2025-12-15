@@ -1,16 +1,20 @@
 import React, { useState, useMemo } from 'react';
 import { Plus, Minus, ShoppingBag, ArrowLeft, RefreshCw } from 'lucide-react';
 import { MenuCategory, CartItem, MenuItem } from '../types';
+import { getTranslation } from '../translations';
 
 interface Props {
   categories: MenuCategory[];
   onBack: () => void;
   onProceedToSummary: (cart: CartItem[]) => void;
+  langCode: string;
 }
 
-const MenuOrdering: React.FC<Props> = ({ categories, onBack, onProceedToSummary }) => {
+const MenuOrdering: React.FC<Props> = ({ categories, onBack, onProceedToSummary, langCode }) => {
   const [activeCategory, setActiveCategory] = useState<string>(categories[0]?.name || '');
   const [cart, setCart] = useState<Record<string, number>>({});
+
+  const t = (key: string) => getTranslation(langCode, key);
 
   const handleAddToCart = (item: MenuItem) => {
     setCart(prev => ({ ...prev, [item.id]: (prev[item.id] || 0) + 1 }));
@@ -48,10 +52,10 @@ const MenuOrdering: React.FC<Props> = ({ categories, onBack, onProceedToSummary 
           </button>
           <h1 className="font-bold text-lg text-stone-800 flex items-center gap-2">
             <span className="w-2 h-6 bg-amber-600 rounded-full inline-block"></span>
-            Menu
+            {t('ordering.title')}
           </h1>
           <button onClick={onBack} className="text-xs font-medium text-stone-400 flex items-center gap-1 hover:text-stone-600">
-             <RefreshCw className="w-3 h-3" /> Rescan
+             <RefreshCw className="w-3 h-3" /> {t('ordering.rescan')}
           </button>
         </div>
 
@@ -103,7 +107,7 @@ const MenuOrdering: React.FC<Props> = ({ categories, onBack, onProceedToSummary 
                             onClick={() => handleAddToCart(item)}
                             className="bg-orange-50 text-amber-700 px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-1 hover:bg-orange-100 transition-colors"
                           >
-                            <Plus className="w-4 h-4" /> Add
+                            <Plus className="w-4 h-4" /> {t('ordering.add')}
                           </button>
                         ) : (
                           <div className="flex items-center gap-4 bg-stone-50 rounded-full px-1 py-1 border border-stone-100">
@@ -135,7 +139,7 @@ const MenuOrdering: React.FC<Props> = ({ categories, onBack, onProceedToSummary 
       {totalItems > 0 && (
         <div className="fixed bottom-0 left-0 w-full p-4 bg-white border-t border-stone-100 shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.05)] z-30">
           <div className="flex items-center justify-between mb-2">
-             <span className="text-sm text-stone-500">Total {totalItems} items</span>
+             <span className="text-sm text-stone-500">{t('ordering.totalItems')} {totalItems}</span>
              <span className="text-2xl font-bold text-amber-700">¥{totalPrice.toLocaleString()}</span>
           </div>
           <button
@@ -143,7 +147,7 @@ const MenuOrdering: React.FC<Props> = ({ categories, onBack, onProceedToSummary 
             className="w-full bg-stone-800 text-white font-bold text-lg py-3 rounded-xl shadow-lg shadow-stone-300 flex items-center justify-center gap-2 active:scale-95 transition-transform"
           >
             <ShoppingBag className="w-5 h-5" />
-            View Order List
+            {t('ordering.viewOrder')}
           </button>
         </div>
       )}

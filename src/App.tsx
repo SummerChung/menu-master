@@ -13,6 +13,8 @@ const App: React.FC = () => {
   const [menuData, setMenuData] = useState<MenuCategory[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
 
+  const langCode = selectedLanguage?.code || 'en-US';
+
   const handleLanguageSelect = (lang: LanguageOption) => {
     setSelectedLanguage(lang);
     setScreen('UPLOAD');
@@ -65,12 +67,13 @@ const App: React.FC = () => {
       {screen === 'UPLOAD' && (
         <ImageUploader 
           onBack={() => setScreen('LANGUAGE')} 
-          onImagesConfirmed={handleImagesConfirmed} 
+          onImagesConfirmed={handleImagesConfirmed}
+          langCode={langCode}
         />
       )}
 
       {screen === 'PROCESSING' && (
-        <ProcessingScreen />
+        <ProcessingScreen langCode={langCode} />
       )}
 
       {screen === 'ORDERING' && (
@@ -78,6 +81,7 @@ const App: React.FC = () => {
           categories={menuData}
           onBack={() => setScreen('UPLOAD')}
           onProceedToSummary={handleGoToSummary}
+          langCode={langCode}
         />
       )}
 
@@ -86,6 +90,7 @@ const App: React.FC = () => {
           cart={cart}
           onBack={() => setScreen('ORDERING')}
           onReset={handleReset}
+          langCode={langCode}
         />
       )}
     </div>

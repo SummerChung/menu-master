@@ -1,15 +1,18 @@
 import React from 'react';
-import { ArrowLeft, CheckCircle2, RefreshCw } from 'lucide-react';
+import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { CartItem } from '../types';
+import { getTranslation } from '../translations';
 
 interface Props {
   cart: CartItem[];
   onBack: () => void;
   onReset: () => void;
+  langCode: string;
 }
 
-const OrderSummary: React.FC<Props> = ({ cart, onBack, onReset }) => {
+const OrderSummary: React.FC<Props> = ({ cart, onBack, onReset, langCode }) => {
   const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const t = (key: string) => getTranslation(langCode, key);
 
   return (
     <div className="flex flex-col h-screen bg-[#fafaf9]">
@@ -18,10 +21,10 @@ const OrderSummary: React.FC<Props> = ({ cart, onBack, onReset }) => {
              <button onClick={onBack} className="p-1 hover:bg-stone-700 rounded-full transition-colors">
                  <ArrowLeft className="w-6 h-6" />
              </button>
-             <span className="text-sm font-medium opacity-70">Show this screen to staff</span>
+             <span className="text-sm font-medium opacity-70">{t('summary.showStaff')}</span>
              <div className="w-6"></div> {/* Spacer */}
          </div>
-         <h1 className="text-3xl font-bold text-center mb-1 text-amber-50">注文リスト</h1>
+         <h1 className="text-3xl font-bold text-center mb-1 text-amber-50">{t('summary.title')}</h1>
          <p className="text-center text-stone-300 text-sm">Order List</p>
       </header>
 
@@ -30,10 +33,10 @@ const OrderSummary: React.FC<Props> = ({ cart, onBack, onReset }) => {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-stone-200 mb-6 relative">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-white border-t border-l border-stone-200 transform rotate-45"></div>
             <p className="text-xl font-bold text-stone-800 text-center mb-2">
-                「すみません、これを注文したいです。」
+                「{t('summary.speechBubble')}」
             </p>
             <p className="text-center text-stone-400 text-xs">
-                (Excuse me, I would like to order this.)
+                {t('summary.speechSub')}
             </p>
         </div>
 
@@ -59,7 +62,7 @@ const OrderSummary: React.FC<Props> = ({ cart, onBack, onReset }) => {
 
         {/* Total */}
         <div className="mt-8 flex items-center justify-between px-4">
-            <span className="text-stone-500 font-medium">Total</span>
+            <span className="text-stone-500 font-medium">{t('summary.total')}</span>
             <span className="text-3xl font-bold text-amber-700">¥{totalPrice.toLocaleString()}</span>
         </div>
       </main>
@@ -71,7 +74,7 @@ const OrderSummary: React.FC<Props> = ({ cart, onBack, onReset }) => {
             className="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-4 rounded-xl shadow-lg shadow-amber-200/50 flex items-center justify-center gap-2 active:scale-95 transition-transform"
          >
             <CheckCircle2 className="w-5 h-5" />
-            Finish & Clear
+            {t('summary.finish')}
          </button>
       </div>
     </div>
