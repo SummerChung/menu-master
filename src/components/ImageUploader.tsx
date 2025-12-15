@@ -70,16 +70,16 @@ const ImageUploader: React.FC<Props> = ({ onBack, onImagesConfirmed, langCode })
       {/* Main Content */}
       <div className="flex-1 w-full overflow-hidden flex flex-col relative">
         {selectedFiles.length === 0 ? (
-            // Empty State: Centered, no scrolling needed
-            <div className="flex-1 flex flex-col items-center justify-center p-8 pb-12">
-                <div className="w-full max-w-[260px] aspect-[3/4] border-2 border-dashed border-stone-300 rounded-3xl flex flex-col items-center justify-center text-stone-400 bg-stone-50/50">
+            // Empty State: Centered, no scrolling
+            <div className="flex-1 flex flex-col items-center justify-center p-6">
+                <div className="w-full max-w-[240px] aspect-[3/4] border-2 border-dashed border-stone-300 rounded-3xl flex flex-col items-center justify-center text-stone-400 bg-stone-50/50">
                     <ImageIcon className="w-10 h-10 mb-3 opacity-40" />
                     <span className="text-sm font-medium opacity-60">{t('upload.noImages')}</span>
                 </div>
             </div>
         ) : (
-            // List State: Scrollable when content exceeds height
-            <div className="flex-1 overflow-y-auto px-4 pb-4">
+            // List State: Scrollable content
+            <div className="flex-1 overflow-y-auto px-4 pb-2">
                 <div className="grid grid-cols-2 gap-3">
                     {previewUrls.map((url, index) => (
                         <div key={index} className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-sm border border-stone-200 group bg-white">
@@ -105,8 +105,8 @@ const ImageUploader: React.FC<Props> = ({ onBack, onImagesConfirmed, langCode })
         )}
       </div>
 
-      {/* Action Area - Fixed at bottom */}
-      <div className="flex-none p-4 pb-8 bg-white rounded-t-3xl shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.05)] space-y-3 z-20">
+      {/* Action Area - Tightened layout */}
+      <div className="flex-none p-4 pb-5 bg-white rounded-t-3xl shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.05)] space-y-3 z-20">
         {/* Hidden Inputs */}
         <input
             type="file"
