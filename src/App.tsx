@@ -62,7 +62,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafaf9] max-w-md mx-auto shadow-2xl overflow-hidden relative border-x border-stone-200">
+    <div className="h-full w-full bg-[#fafaf9] max-w-md mx-auto shadow-2xl relative border-x border-stone-200 overflow-hidden">
       {screen === 'LANGUAGE' && (
         <LanguageSelector onSelect={handleLanguageSelect} />
       )}

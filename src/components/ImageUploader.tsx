@@ -50,7 +50,7 @@ const ImageUploader: React.FC<Props> = ({ onBack, onImagesConfirmed, langCode })
   const t = (key: string) => getTranslation(langCode, key);
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-[#fafaf9] relative overflow-hidden">
+    <div className="flex flex-col h-full bg-[#fafaf9] relative overflow-hidden">
       {/* Header */}
       <header className="flex-none p-4 pt-6 flex items-center relative z-10">
         <button
@@ -105,8 +105,8 @@ const ImageUploader: React.FC<Props> = ({ onBack, onImagesConfirmed, langCode })
         )}
       </div>
 
-      {/* Action Area - Tightened layout */}
-      <div className="flex-none p-4 pb-5 bg-white rounded-t-3xl shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.05)] space-y-3 z-20">
+      {/* Action Area - Tightened layout without extra spacing */}
+      <div className="flex-none p-4 pb-6 bg-white rounded-t-3xl shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.05)] space-y-3 z-20">
         {/* Hidden Inputs */}
         <input
             type="file"

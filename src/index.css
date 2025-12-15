@@ -3,6 +3,18 @@
 @tailwind utilities;
 
 @layer base {
+  html, body, #root {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    /* Prevent elastic scrolling on iOS */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
   body {
     @apply bg-[#fafaf9] font-sans text-stone-800 antialiased;
     -webkit-tap-highlight-color: transparent;
