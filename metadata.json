@@ -1,0 +1,7 @@
+{
+  "name": "Menu Master",
+  "description": "Snap a photo of any menu to instantly translate it and generate an interactive ordering interface.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
