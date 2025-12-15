@@ -51,59 +51,62 @@ const ImageUploader: React.FC<Props> = ({ onBack, onImagesConfirmed, langCode })
 
   return (
     <div className="flex flex-col h-[100dvh] bg-[#fafaf9] relative overflow-hidden">
-      {/* Header - Compact */}
-      <header className="flex-none p-4 pt-4 flex items-center relative z-10">
+      {/* Header */}
+      <header className="flex-none p-4 pt-6 flex items-center relative z-10">
         <button
           onClick={onBack}
-          className="p-2 bg-white/80 backdrop-blur-md rounded-full shadow-sm hover:bg-white text-stone-700 mr-4"
+          className="p-2 bg-white/80 backdrop-blur-md rounded-full shadow-sm hover:bg-white text-stone-700 mr-4 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1">
              <h2 className="text-xl font-bold text-stone-800 leading-tight">{t('upload.title')}</h2>
-             <p className="text-stone-500 text-xs leading-tight line-clamp-1">
+             <p className="text-stone-500 text-xs leading-tight line-clamp-1 mt-0.5">
                 {t('upload.subtitle')}
             </p>
         </div>
       </header>
 
-      {/* Main Content - Flex Grow to take available space */}
-      <div className="flex-1 overflow-y-auto px-4 pb-4 w-full">
-        {/* Image Preview Grid */}
-        <div className="h-full">
-            {selectedFiles.length === 0 ? (
-                <div className="h-full min-h-[300px] border-2 border-dashed border-stone-300 rounded-2xl flex flex-col items-center justify-center text-stone-400 bg-stone-100/50">
-                    <ImageIcon className="w-12 h-12 mb-2 opacity-50" />
-                    <span className="text-sm">{t('upload.noImages')}</span>
+      {/* Main Content */}
+      <div className="flex-1 w-full overflow-hidden flex flex-col relative">
+        {selectedFiles.length === 0 ? (
+            // Empty State: Centered, no scrolling needed
+            <div className="flex-1 flex flex-col items-center justify-center p-8 pb-12">
+                <div className="w-full max-w-[260px] aspect-[3/4] border-2 border-dashed border-stone-300 rounded-3xl flex flex-col items-center justify-center text-stone-400 bg-stone-50/50">
+                    <ImageIcon className="w-10 h-10 mb-3 opacity-40" />
+                    <span className="text-sm font-medium opacity-60">{t('upload.noImages')}</span>
                 </div>
-            ) : (
-                <div className="grid grid-cols-2 gap-3 pb-4">
+            </div>
+        ) : (
+            // List State: Scrollable when content exceeds height
+            <div className="flex-1 overflow-y-auto px-4 pb-4">
+                <div className="grid grid-cols-2 gap-3">
                     {previewUrls.map((url, index) => (
-                        <div key={index} className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-md border border-stone-200 group bg-white">
+                        <div key={index} className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-sm border border-stone-200 group bg-white">
                             <img src={url} alt={`Preview ${index}`} className="w-full h-full object-cover" />
                             <button 
                                 onClick={() => removeFile(index)}
                                 className="absolute top-2 right-2 bg-black/50 text-white p-1.5 rounded-full hover:bg-red-600 transition-colors backdrop-blur-sm"
                             >
-                                <X className="w-4 h-4" />
+                                <X className="w-3.5 h-3.5" />
                             </button>
                             <div className="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-full backdrop-blur-sm">
                                 {index + 1}
                             </div>
                         </div>
                     ))}
-                    {/* Placeholder to suggest adding more */}
-                    <button onClick={triggerCamera} className="aspect-[3/4] rounded-xl border-2 border-dashed border-stone-300 flex flex-col items-center justify-center text-stone-400 hover:bg-stone-100 transition-colors bg-white">
-                        <Plus className="w-8 h-8 mb-1" />
-                        <span className="text-xs">{t('upload.addPage')}</span>
+                    {/* Add more button */}
+                    <button onClick={triggerCamera} className="aspect-[3/4] rounded-xl border-2 border-dashed border-stone-300 flex flex-col items-center justify-center text-stone-400 hover:bg-stone-50 transition-colors bg-white/50">
+                        <Plus className="w-6 h-6 mb-1 opacity-60" />
+                        <span className="text-xs font-medium">{t('upload.addPage')}</span>
                     </button>
                 </div>
-            )}
-        </div>
+            </div>
+        )}
       </div>
 
       {/* Action Area - Fixed at bottom */}
-      <div className="flex-none p-4 pb-6 bg-white rounded-t-3xl shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.05)] space-y-3 z-20">
+      <div className="flex-none p-4 pb-8 bg-white rounded-t-3xl shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.05)] space-y-3 z-20">
         {/* Hidden Inputs */}
         <input
             type="file"
@@ -134,17 +137,17 @@ const ImageUploader: React.FC<Props> = ({ onBack, onImagesConfirmed, langCode })
             <div className="grid grid-cols-2 gap-3">
                 <button
                 onClick={triggerCamera}
-                className="bg-stone-800 hover:bg-stone-900 text-white py-4 rounded-2xl shadow-lg flex flex-col items-center justify-center gap-1 transition-transform active:scale-95 h-24"
+                className="bg-stone-800 hover:bg-stone-900 text-white py-4 rounded-2xl shadow-lg flex flex-col items-center justify-center gap-1 transition-transform active:scale-95 h-20"
                 >
-                <Camera className="w-8 h-8 mb-1" />
+                <Camera className="w-7 h-7 mb-1" />
                 <span className="font-semibold text-sm">{t('upload.camera')}</span>
                 </button>
                 
                 <button
                 onClick={triggerGallery}
-                className="bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-200 py-4 rounded-2xl shadow-sm flex flex-col items-center justify-center gap-1 transition-transform active:scale-95 h-24"
+                className="bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-200 py-4 rounded-2xl shadow-sm flex flex-col items-center justify-center gap-1 transition-transform active:scale-95 h-20"
                 >
-                <ImageIcon className="w-8 h-8 mb-1" />
+                <ImageIcon className="w-7 h-7 mb-1" />
                 <span className="font-semibold text-sm">{t('upload.gallery')}</span>
                 </button>
             </div>
