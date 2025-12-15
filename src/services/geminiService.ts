@@ -1,14 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { MenuCategory } from '../types';
 
-// Initialize Gemini with the API key from environment variables
-const apiKey = process.env.API_KEY;
-if (!apiKey) {
-  console.error("API Key is missing. Please set API_KEY in your environment variables.");
-}
-
-const ai = new GoogleGenAI({ apiKey: apiKey || 'MISSING_KEY' });
-
 export interface GenerativePart {
   inlineData: {
     data: string;
@@ -44,11 +36,19 @@ export const fileToGenerativePart = async (file: File): Promise<GenerativePart> 
 
 // Analyze menu images using Gemini
 export const analyzeMenu = async (imageParts: GenerativePart[], targetLanguage: string): Promise<MenuCategory[]> => {
-  try {
-    if (!apiKey) {
-        throw new Error("API Key is not configured. Please check your Vercel Project Settings.");
-    }
+  // Retrieve API Key from standard Vite env injection
+  // @ts-ignore
+  const apiKey = import.meta.env.VITE_API_KEY || process.env.API_KEY;
 
+  if (!apiKey || apiKey === 'undefined') {
+      console.error("API Key check failed. Value is missing.");
+      throw new Error("API Key is missing. Please check Vercel Settings > Environment Variables.");
+  }
+
+  // Initialize client inside the function to ensure we use the latest key
+  const ai = new GoogleGenAI({ apiKey: apiKey });
+
+  try {
     const model = 'gemini-2.5-flash';
 
     const response = await ai.models.generateContent({
@@ -100,7 +100,7 @@ export const analyzeMenu = async (imageParts: GenerativePart[], targetLanguage: 
     let text = response.text;
     if (!text) throw new Error("No data returned from Gemini");
 
-    // Clean up markdown code blocks if present (just in case)
+    // Clean up markdown code blocks if present
     if (text.startsWith("```json")) {
       text = text.replace(/^```json\s*/, "").replace(/\s*```$/, "");
     } else if (text.startsWith("```")) {
@@ -127,7 +127,7 @@ export const analyzeMenu = async (imageParts: GenerativePart[], targetLanguage: 
     console.error("Gemini Analysis Error:", error);
     // Improve error message if it's a 400 or 403
     if (error.message?.includes('403') || error.message?.includes('API key')) {
-        throw new Error("Invalid or missing API Key. Please check your Vercel settings.");
+        throw new Error("Invalid API Key. The key provided is rejected by Google.");
     }
     throw error;
   }
