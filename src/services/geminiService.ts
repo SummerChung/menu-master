@@ -2,17 +2,40 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { MenuCategory } from '../types';
 
 // Initialize Gemini with the API key from environment variables
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const apiKey = process.env.API_KEY;
+if (!apiKey) {
+  console.error("API Key is missing. Please set API_KEY in your environment variables.");
+}
 
-// Helper to convert file to base64
-export const fileToGenerativePart = async (file: File): Promise<string> => {
+const ai = new GoogleGenAI({ apiKey: apiKey || 'MISSING_KEY' });
+
+export interface GenerativePart {
+  inlineData: {
+    data: string;
+    mimeType: string;
+  };
+}
+
+// Helper to convert file to base64 with correct mime type
+export const fileToGenerativePart = async (file: File): Promise<GenerativePart> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64String = reader.result as string;
-      // Remove the data URL prefix (e.g. "data:image/jpeg;base64,")
-      const base64Data = base64String.split(',')[1];
-      resolve(base64Data);
+      // Extract mime type and base64 data
+      // format: "data:image/jpeg;base64,....."
+      const match = base64String.match(/^data:(.*?);base64,(.*)$/);
+      
+      if (match) {
+        resolve({
+          inlineData: {
+            mimeType: match[1],
+            data: match[2]
+          }
+        });
+      } else {
+        reject(new Error("Failed to process image file."));
+      }
     };
     reader.onerror = reject;
     reader.readAsDataURL(file);
@@ -20,17 +43,13 @@ export const fileToGenerativePart = async (file: File): Promise<string> => {
 };
 
 // Analyze menu images using Gemini
-export const analyzeMenu = async (base64Images: string[], targetLanguage: string): Promise<MenuCategory[]> => {
+export const analyzeMenu = async (imageParts: GenerativePart[], targetLanguage: string): Promise<MenuCategory[]> => {
   try {
-    const model = 'gemini-2.5-flash';
+    if (!apiKey) {
+        throw new Error("API Key is not configured. Please check your Vercel Project Settings.");
+    }
 
-    // Create image parts for all uploaded pages
-    const imageParts = base64Images.map(img => ({
-      inlineData: {
-        mimeType: 'image/jpeg',
-        data: img
-      }
-    }));
+    const model = 'gemini-2.5-flash';
 
     const response = await ai.models.generateContent({
       model: model,
@@ -104,8 +123,12 @@ export const analyzeMenu = async (base64Images: string[], targetLanguage: string
 
     return categories;
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini Analysis Error:", error);
+    // Improve error message if it's a 400 or 403
+    if (error.message?.includes('403') || error.message?.includes('API key')) {
+        throw new Error("Invalid or missing API Key. Please check your Vercel settings.");
+    }
     throw error;
   }
 };

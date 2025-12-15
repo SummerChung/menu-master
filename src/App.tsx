@@ -23,11 +23,11 @@ const App: React.FC = () => {
     setScreen('PROCESSING');
 
     try {
-      // Convert all files to base64 strings
-      const base64Promises = files.map(file => fileToGenerativePart(file));
-      const base64Images = await Promise.all(base64Promises);
+      // Convert all files to base64 parts with mime types
+      const partPromises = files.map(file => fileToGenerativePart(file));
+      const imageParts = await Promise.all(partPromises);
       
-      const data = await analyzeMenu(base64Images, selectedLanguage.label);
+      const data = await analyzeMenu(imageParts, selectedLanguage.label);
       
       if (data && data.length > 0) {
         setMenuData(data);
@@ -36,9 +36,10 @@ const App: React.FC = () => {
         alert("Could not identify menu items. Please try again with a clearer photo.");
         setScreen('UPLOAD');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert("Error processing menu. Please try again.");
+      const errorMessage = error.message || "Unknown error occurred";
+      alert(`Error processing menu: ${errorMessage}`);
       setScreen('UPLOAD');
     }
   };
