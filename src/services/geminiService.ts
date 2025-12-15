@@ -38,7 +38,11 @@ export const fileToGenerativePart = async (file: File): Promise<GenerativePart> 
 export const analyzeMenu = async (imageParts: GenerativePart[], targetLanguage: string): Promise<MenuCategory[]> => {
   // Retrieve API Key from standard Vite env injection
   // @ts-ignore
-  const apiKey = import.meta.env.VITE_API_KEY || process.env.API_KEY;
+  let rawApiKey = import.meta.env.VITE_API_KEY || process.env.API_KEY;
+
+  // SANITIZATION STEP:
+  // Remove any surrounding quotes (" or ') and whitespace that might have been copied into Vercel
+  const apiKey = rawApiKey ? rawApiKey.replace(/["']/g, "").trim() : "";
 
   if (!apiKey || apiKey === 'undefined') {
       console.error("API Key check failed. Value is missing.");
@@ -127,7 +131,7 @@ export const analyzeMenu = async (imageParts: GenerativePart[], targetLanguage: 
     console.error("Gemini Analysis Error:", error);
     // Improve error message if it's a 400 or 403
     if (error.message?.includes('403') || error.message?.includes('API key')) {
-        throw new Error("Invalid API Key. The key provided is rejected by Google.");
+        throw new Error("Invalid API Key. Google rejected the key. Please ensure you are using a valid AI Studio key without IP restrictions.");
     }
     throw error;
   }
